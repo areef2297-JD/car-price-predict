@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Predictor Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Car Price Predictor</h1>
+            <p>Real-time machine learning price predictions powered by Ridge Regression (88.7% Accuracy)</p>
+        </header>
+
+        <!-- Main Dashboard Navigation Tabs -->
+        <div class="tabs-nav" style="border-bottom: 2px solid var(--card-border); margin-bottom: 2rem;">
+            <button class="tab-btn active" onclick="switchMainTab('predictor-dashboard')">Interactive Predictor</button>
+            <button class="tab-btn" onclick="switchMainTab('evaluation-dashboard')">Model Training Report</button>
+        </div>
+
+        <!-- TAB 1: INTERACTIVE PREDICTOR DASHBOARD -->
+        <div id="predictor-dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <!-- Input Panel -->
+                <div class="glass-panel">
+                    <!-- Form Tabs Nav -->
+                    <div class="tabs-nav">
+                        <button class="tab-btn active" onclick="switchFormTab(event, 'engine-tab')">Engine & Power</button>
+                        <button class="tab-btn" onclick="switchFormTab(event, 'body-tab')">Body & Style</button>
+                        <button class="tab-btn" onclick="switchFormTab(event, 'dims-tab')">Dimensions & Fuel</button>
+                    </div>
+
+                    <!-- Form Element -->
+                    <form id="prediction-form" onsubmit="event.preventDefault();">
+                        
+                        <!-- Form Tab 1: Engine & Power -->
+                        <div id="engine-tab" class="tab-content active">
+                            <div class="inputs-grid">
+                                <div class="form-group">
+                                    <label for="horsepower">Horsepower <span class="value-display" id="val-horsepower">95</span></label>
+                                    <input type="range" id="horsepower" min="48" max="288" value="95" step="1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="enginesize">Engine Size (cc) <span class="value-display" id="val-enginesize">120</span></label>
+                                    <input type="range" id="enginesize" min="61" max="326" value="120" step="1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="peakrpm">Peak RPM <span class="value-display" id="val-peakrpm">5100</span></label>
+                                    <input type="range" id="peakrpm" min="4150" max="6600" value="5100" step="50" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fueltype">Fuel Type</label>
+                                    <select id="fueltype" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="aspiration">Aspiration</label>
+                                    <select id="aspiration" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cylindernumber">Cylinders</label>
+                                    <select id="cylindernumber" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="enginetype">Engine Type</label>
+                                    <select id="enginetype" onchange="calculatePrice()"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Tab 2: Body & Style -->
+                        <div id="body-tab" class="tab-content">
+                            <div class="inputs-grid">
+                                <div class="form-group">
+                                    <label for="brand">Brand</label>
+                                    <select id="brand" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="carbody">Body Style</label>
+                                    <select id="carbody" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="drivewheel">Drive Wheel</label>
+                                    <select id="drivewheel" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="enginelocation">Engine Location</label>
+                                    <select id="enginelocation" onchange="calculatePrice()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="doornumber">Doors</label>
+                                    <select id="doornumber" onchange="calculatePrice()"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Tab 3: Dimensions & Fuel -->
+                        <div id="dims-tab" class="tab-content">
+                            <div class="inputs-grid">
+                                <div class="form-group">
+                                    <label for="curbweight">Curb Weight (lbs) <span class="value-display" id="val-curbweight">2422</span></label>
+                                    <input type="range" id="curbweight" min="1488" max="4066" value="2422" step="5" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="carlength">Car Length (in) <span class="value-display" id="val-carlength">173.2</span></label>
+                                    <input type="range" id="carlength" min="141.1" max="208.1" value="173.2" step="0.1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="carwidth">Car Width (in) <span class="value-display" id="val-carwidth">65.5</span></label>
+                                    <input type="range" id="carwidth" min="60.3" max="72.3" value="65.5" step="0.1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="carheight">Car Height (in) <span class="value-display" id="val-carheight">54.1</span></label>
+                                    <input type="range" id="carheight" min="47.8" max="59.8" value="54.1" step="0.1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="wheelbase">Wheelbase (in) <span class="value-display" id="val-wheelbase">97.0</span></label>
+                                    <input type="range" id="wheelbase" min="86.6" max="120.9" value="97.0" step="0.1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="compressionratio">Compression Ratio <span class="value-display" id="val-compressionratio">9.0</span></label>
+                                    <input type="range" id="compressionratio" min="7.0" max="23.0" value="9.0" step="0.1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="boreratio">Bore Ratio <span class="value-display" id="val-boreratio">3.32</span></label>
+                                    <input type="range" id="boreratio" min="2.54" max="3.94" value="3.32" step="0.01" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="stroke">Stroke <span class="value-display" id="val-stroke">3.29</span></label>
+                                    <input type="range" id="stroke" min="2.07" max="4.17" value="3.29" step="0.01" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="citympg">City MPG <span class="value-display" id="val-citympg">24</span></label>
+                                    <input type="range" id="citympg" min="13" max="49" value="24" step="1" oninput="updateValDisplay(this); syncHighwayMpg(this.value)">
+                                </div>
+                                <div class="form-group" style="display:none;">
+                                    <!-- Kept hidden, computed dynamically as citympg * 1.25 -->
+                                    <input type="hidden" id="highwaympg" value="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="symboling">Symboling Rating <span class="value-display" id="val-symboling">1</span></label>
+                                    <input type="range" id="symboling" min="-3" max="3" value="1" step="1" oninput="updateValDisplay(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fuelsystem">Fuel System</label>
+                                    <select id="fuelsystem" onchange="calculatePrice()"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results & Details -->
+                <div class="results-panel">
+                    <div class="price-card">
+                        <h2>Estimated Value</h2>
+                        <div class="price-display" id="predicted-price">$0.00</div>
+                        <p class="disclaimer">Calculated in real-time by the Ridge regression model.</p>
+                    </div>
+
+                    <div class="glass-panel contributions-card">
+                        <h3>Feature Contributions</h3>
+                        <div class="contrib-list">
+                            <div class="contrib-item">
+                                <span class="contrib-label">Base Value (Mean Price)</span>
+                                <span class="contrib-value neutral" id="contrib-base">$0.00</span>
+                            </div>
+                            <div class="contrib-item">
+                                <span class="contrib-label">Engine size & power impact</span>
+                                <span class="contrib-value" id="contrib-engine">$0.00</span>
+                            </div>
+                            <div class="contrib-item">
+                                <span class="contrib-label">Car Dimensions impact</span>
+                                <span class="contrib-value" id="contrib-dims">$0.00</span>
+                            </div>
+                            <div class="contrib-item">
+                                <span class="contrib-label">Brand prestige & Country origin</span>
+                                <span class="contrib-value" id="contrib-brand">$0.00</span>
+                            </div>
+                            <div class="contrib-item">
+                                <span class="contrib-label">Fuel efficiency impact</span>
+                                <span class="contrib-value" id="contrib-mpg">$0.00</span>
+                            </div>
+                            <div class="contrib-item">
+                                <span class="contrib-label">Other specifications impact</span>
+                                <span class="contrib-value" id="contrib-other">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MODEL TRAINING REPORT -->
+        <div id="evaluation-dashboard" class="tab-content">
+            <div class="glass-panel report-section">
+                <div>
+                    <h3>Model Evaluation Report</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        This dashboard showcases the training results of three different regression algorithms. 
+                        The **Random Forest** model was chosen for the local Python CLI predictions, while the 
+                        mathematically equivalent **Ridge Regression** was exported to JavaScript for fast, client-side browser performance.
+                    </p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algorithm Candidate</th>
+                                <th>Test R² Score</th>
+                                <th>Test MAE</th>
+                                <th>Test RMSE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: rgba(0,242,254,0.05); border-left: 3px solid var(--primary-neon);">
+                                <td><strong>Random Forest (Best CLI Model)</strong></td>
+                                <td><strong>0.9183</strong></td>
+                                <td><strong>$1,841.23</strong></td>
+                                <td><strong>$2,480.82</strong></td>
+                            </tr>
+                            <tr style="background: rgba(155,81,224,0.05); border-left: 3px solid var(--secondary-neon);">
+                                <td><strong>Ridge Regression (Web Model)</strong></td>
+                                <td><strong>0.8872</strong></td>
+                                <td><strong>$2,016.00</strong></td>
+                                <td><strong>$2,915.87</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Gradient Boosting</td>
+                                <td>0.9125</td>
+                                <td>$1,861.64</td>
+                                <td>$2,566.87</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h3>Diagnostic Visualizations</h3>
+                    <div class="plots-grid">
+                        <div class="plot-card span-2">
+                            <h4>Actual Price vs. Predicted Price (Random Forest)</h4>
+                            <img src="plots/actual_vs_predicted.png" alt="Actual vs Predicted Prices">
+                        </div>
+                        <div class="plot-card">
+                            <h4>Residuals Analysis & Errors Distribution</h4>
+                            <img src="plots/residuals_analysis.png" alt="Residuals Analysis">
+                        </div>
+                        <div class="plot-card">
+                            <h4>Top 15 Feature Importances</h4>
+                            <img src="plots/feature_importance.png" alt="Feature Importance">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Developed with Google Antigravity | View project on <a href="https://github.com/areef2297-JD/car-price-predictor" target="_blank" id="footer-github-link">GitHub</a></p>
+        </footer>
+    </div>
+
+    <!-- Sourced Scripts -->
+    <script src="model_data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

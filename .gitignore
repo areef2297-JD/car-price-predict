@@ -1,0 +1,14 @@
+# Python bytecodes
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Archives
+archive.zip
+test_predictions.csv
+predictions.csv
+
+# Environments & IDEs
+.vscode/
+.idea/
+.DS_Store
